@@ -1,7 +1,7 @@
 import express, { Express } from "express";
 import dotenv from "dotenv";
 
-import foods from "@app/foods";
+import foods from "./foods";
 
 dotenv.config();
 
