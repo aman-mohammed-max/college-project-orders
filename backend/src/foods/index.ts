@@ -1,8 +1,9 @@
-import express, { Router, Request, Response } from "express";
+import express, { Router } from "express";
 const router: Router = express.Router();
 
-router.get("/", (rq: Request, rs: Response) => {
-  rs.json({ hello: "hgdsdg" });
-});
+import Get from "@app/foods/controllers/Get"
+
+router.get("/", Get.list);
+router.get("/:id", Get.byid);
 
 export default router;

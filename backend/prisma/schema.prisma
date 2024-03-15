@@ -1,0 +1,53 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "cockroachdb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String @id @unique @default(uuid())
+  email     String @unique
+  name      String
+  passworid String
+}
+
+model Food {
+  id          String  @id @unique @default(uuid())
+  name        String
+  price       Int
+  QMTO        Boolean @default(true)
+  details     Json?
+  description String?
+}
+
+model Order {
+  id        String   @id @unique @default(uuid())
+  userId    String
+  foodId    String
+  quantity  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Table {
+  id       String @id @unique @default(uuid())
+  number   String
+  capacity Int
+  status   Int
+}
+
+model Chef {
+  id       String @id @unique @default(uuid())
+  name     String
+  email    String @unique
+  password String
+}
