@@ -27,22 +27,22 @@ model Food {
   QMTO        Boolean @default(true)
   details     Json?
   description String?
+  orders      Order[]
 }
 
 model Order {
   id        String   @id @unique @default(uuid())
   userId    String
-  foodId    String
-  quantity  Int
+  foods     Food[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Table {
-  id       String @id @unique @default(uuid())
-  number   String
-  capacity Int
-  status   Int
+  id     String @id @unique
+  number String
+  status String @default("available")
+  QRCode String @unique
 }
 
 model Chef {

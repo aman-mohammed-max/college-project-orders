@@ -25,6 +25,7 @@
       "@/*": [
         "./src/*"
       ],
+      "@Globaltypes/*": ["../Types/*"],
     }
   },
   "include": ["src"],

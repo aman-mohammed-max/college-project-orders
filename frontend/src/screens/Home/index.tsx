@@ -1,3 +1,4 @@
+import axios from "axios";
 import {
   CircleUserRound,
   LogOut,
@@ -27,13 +28,42 @@ import {
 } from "@/components/ui/drawer";
 
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import Out from "@Globaltypes/res.out";
+import TableProps from "@Globaltypes/table";
 import Dishe_card from "@/components/custom/dishe_card";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import QrReader from "react-web-qr-reader";
 import validUrl from "valid-url";
 import Category_card from "@/components/custom/category_card";
+import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import Url from "@/lib/apiurl";
+import { cn } from "@/lib/utils";
+import FoodProps from "@Globaltypes/food";
 
 export default function Home() {
+  const [table, settable] = useState<TableProps | undefined | null>(undefined);
+  const [Foods, setFoods] = useState<FoodProps[]>([]);
+  const { id } = useParams();
+  useEffect(() => {
+    axios.get(`${Url.table}/${id}`).then((res: { data: Out }) => {
+      if (res.data.status === "success" && id) {
+        settable(res.data.data);
+      } else if (res.data.status === "error" && id) {
+        console.error(res.data.message);
+      } else if (res.data.status === "idle" && id) {
+        settable(null);
+      }
+    });
+    axios.get(`${Url.foods}`).then((res: { data: Out }) => {
+      if (res.data.status === "success") {
+        setFoods(res.data.data);
+      } else if (res.data.status === "error") {
+        console.error(res.data.message);
+      }
+    });
+  }, [id]);
+
   const handleScan = (result: any) => {
     if (result) {
       if (validUrl.isUri(result.data)) {
@@ -41,7 +71,6 @@ export default function Home() {
       }
     }
   };
-
   const handleError = (error: any) => {
     console.log(error);
   };
@@ -51,15 +80,27 @@ export default function Home() {
       <Drawer>
         <header className="flex px-2 py-1 align-middle items-center justify-between">
           <h1 className="text-3xl font-Madimi_One">Tasty</h1>
-          <div>
-            <DrawerTrigger asChild>
-              <Button size="icon" variant="ghost">
-                <ScanLine size="26" />
-              </Button>
-            </DrawerTrigger>
-
+          <div className="flex justify-center items-center">
+            {table ? (
+              <div
+                className={cn(
+                  buttonVariants({
+                    variant: "ghost",
+                    size: "icon",
+                  })
+                )}
+              >
+                <h1 className="text-lg font-bold">H{table.number}</h1>
+              </div>
+            ) : (
+              <DrawerTrigger asChild>
+                <Button size="icon" variant="ghost">
+                  <ScanLine size="26" />
+                </Button>
+              </DrawerTrigger>
+            )}
             <DropdownMenu>
-              <DropdownMenuTrigger className="focus:outline-none">
+              <DropdownMenuTrigger className="focus:outline-none" asChild>
                 <Button size="icon" variant="ghost">
                   <CircleUserRound size="26" />
                 </Button>
@@ -89,32 +130,27 @@ export default function Home() {
 
         <main className=" h-[89vh] w-full">
           <ScrollArea className="h-full w-full">
-            <Category_card name="Starters">
-              <Dishe_card
-                name="Some Dishe"
-                price={99}
-                image="https://via.placeholder.com/360x600"
-                rating={3}
-              />
-              <Dishe_card
-                name="Some Dishe"
-                price={99}
-                image="https://via.placeholder.com/360x600"
-                rating={3}
-              />
-              <Dishe_card
-                name="Some Dishe"
-                price={99}
-                image="https://via.placeholder.com/360x600"
-                rating={3}
-              />
-            </Category_card>
+            {Foods.map((category: any) => (
+              <Category_card name={category.name} key={category.id}>
+                {category.ithems.map((dishe: any) => (
+                  <Dishe_card
+                    key={dishe.id}
+                    tabID={id}
+                    id={dishe.id}
+                    name={dishe.name}
+                    price={dishe.price}
+                    image={dishe.image}
+                    rating={dishe.rating}
+                  />
+                ))}
+              </Category_card>
+            ))}
             <ScrollBar />
           </ScrollArea>
         </main>
         <DrawerContent>
           <DrawerHeader className="pb-3">
-            <DrawerTitle>Select Your Table </DrawerTitle>
+            <DrawerTitle>Select Your Table</DrawerTitle>
             <DrawerDescription>Scan the QR Code of the table</DrawerDescription>
           </DrawerHeader>
           <div className="px-4">

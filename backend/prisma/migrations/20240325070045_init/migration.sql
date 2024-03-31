@@ -36,10 +36,8 @@ CREATE TABLE "Order" (
 CREATE TABLE "Table" (
     "id" STRING NOT NULL,
     "number" STRING NOT NULL,
-    "capacity" INT4 NOT NULL,
-    "status" INT4 NOT NULL,
-
-    CONSTRAINT "Table_pkey" PRIMARY KEY ("id")
+    "status" STRING NOT NULL DEFAULT 'available',
+    "QRCode" STRING NOT NULL
 );
 
 -- CreateTable
@@ -66,6 +64,9 @@ CREATE UNIQUE INDEX "Order_id_key" ON "Order"("id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Table_id_key" ON "Table"("id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Table_QRCode_key" ON "Table"("QRCode");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Chef_id_key" ON "Chef"("id");

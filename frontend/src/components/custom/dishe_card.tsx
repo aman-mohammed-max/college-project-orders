@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import db from "@/utils/localDB";
 import {
   Card,
   CardContent,
@@ -14,6 +15,8 @@ import "@smastrom/react-rating/style.css";
 import { CarouselItem } from "@/components/ui/carousel";
 
 export type DisheProps = {
+  id: any;
+  tabID: any;
   name: string;
   price: number;
   image: string;
@@ -22,6 +25,36 @@ export type DisheProps = {
 
 function Dishe_card(props: DisheProps) {
   const [qn, setqn] = useState<number>(0);
+
+  function db_headler() {
+    if (qn === 0 || qn === undefined) {
+      db.collection("foods").doc({ id: props.id.toString() }).delete();
+    } else {
+      db.collection("foods").add(
+        {
+          id: props.id.toString(),
+          quality: qn,
+          tabID: props.tabID.toString(),
+        },
+        props.id.toString()
+      );
+    }
+  }
+
+  useEffect(() => {
+    db.collection("foods")
+      .doc({ id: props.id.toString() })
+      .get()
+      .then((document: any) => {
+        if (document?.quality !== undefined) {
+          setqn(document.quality);
+        }
+      });
+  }, []);
+
+  useEffect(() => {
+    db_headler();
+  }, [qn]);
 
   return (
     <CarouselItem className="basis-1/3 pl-1">
@@ -53,9 +86,10 @@ function Dishe_card(props: DisheProps) {
               <Button
                 variant="ghost"
                 onClick={() => {
-                  setqn(qn - 1);
+                  setqn((prv) => prv - 1);
                 }}
                 size="sm"
+                disabled={qn === 0}
                 className="h-7 w-7 px-2 text-xs"
               >
                 -
@@ -64,7 +98,7 @@ function Dishe_card(props: DisheProps) {
               <Button
                 variant="ghost"
                 onClick={() => {
-                  setqn(qn + 1);
+                  setqn((prv) => prv + 1);
                 }}
                 size="sm"
                 className="h-7 w-7 px-2 text-xs"
