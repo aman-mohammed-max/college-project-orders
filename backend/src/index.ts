@@ -5,6 +5,7 @@ import { Server } from "socket.io";
 
 import foods from "@app/foods";
 import table from "@app/table";
+import orders from "@app/orders";
 import Socket from "@app/socket";
 import cors from "cors";
 
@@ -19,7 +20,7 @@ app.use(cors({ origin: "*" }));
 app.use(express.json());
 
 app.use("/foods", foods);
-
+app.use("/orders", orders);
 app.use("/table", table);
 
 io.on("connection", Socket);

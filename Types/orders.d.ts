@@ -14,6 +14,7 @@ export interface Orders {
   id: string;
   userId: String;
   foods: Food[];
-  createdAt: Date;
-  updatedAt: Date;
+  status: OrdersProps["status"];
+  createdAt?: Date;
+  updatedAt?: Date;
 }

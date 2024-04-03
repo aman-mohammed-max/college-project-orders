@@ -12,20 +12,30 @@ CREATE TABLE "User" (
 CREATE TABLE "Food" (
     "id" STRING NOT NULL,
     "name" STRING NOT NULL,
+    "image" STRING NOT NULL,
     "price" INT4 NOT NULL,
-    "QMTO" BOOL NOT NULL DEFAULT true,
     "details" JSONB,
     "description" STRING,
+    "categoryId" STRING,
+    "rating" FLOAT8,
 
     CONSTRAINT "Food_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
+CREATE TABLE "Category" (
+    "id" STRING NOT NULL,
+    "name" STRING NOT NULL,
+
+    CONSTRAINT "Category_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Order" (
     "id" STRING NOT NULL,
-    "userId" STRING NOT NULL,
-    "foodId" STRING NOT NULL,
-    "quantity" INT4 NOT NULL,
+    "userId" STRING,
+    "status" STRING NOT NULL,
+    "foods" JSONB NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -37,7 +47,9 @@ CREATE TABLE "Table" (
     "id" STRING NOT NULL,
     "number" STRING NOT NULL,
     "status" STRING NOT NULL DEFAULT 'available',
-    "QRCode" STRING NOT NULL
+    "QRCode" STRING NOT NULL,
+
+    CONSTRAINT "Table_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -60,6 +72,9 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 CREATE UNIQUE INDEX "Food_id_key" ON "Food"("id");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Category_id_key" ON "Category"("id");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Order_id_key" ON "Order"("id");
 
 -- CreateIndex
@@ -73,3 +88,6 @@ CREATE UNIQUE INDEX "Chef_id_key" ON "Chef"("id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Chef_email_key" ON "Chef"("email");
+
+-- AddForeignKey
+ALTER TABLE "Food" ADD CONSTRAINT "Food_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "Category"("id") ON DELETE SET NULL ON UPDATE CASCADE;

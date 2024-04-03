@@ -91,7 +91,16 @@ class Get {
     //     } as Out);
     //   });
     // @ts-ignore
-    const food = FakeData.find((food: FoodProps) => food.id === Number(id));
+    const foods = [];
+    FakeData.map((co: any) => {
+      co.ithems.map((it: any) => {
+        if (it.id == id) {
+          foods.push(it);
+        }
+      });
+    });
+    // @ts-ignore
+    const food = foods.filter((food: any) => food.id == id)[0];
     if (!food) {
       res.json({
         status: "idle",

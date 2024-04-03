@@ -10,12 +10,18 @@ import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useSearchParams } from "react-router-dom";
 import OrdersProps from "@Globaltypes/orders";
+import { useState } from "react";
 
 export default function Nav_button({ link, isCollapsed, index }: any) {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [statusi, setstatusi] = useState<string | null>(null);
 
   function tablehandler(data: OrdersProps) {
     console.log(`Table ${link.id} received ${JSON.stringify(data)}`);
+    if (data.status === "orderd") {
+      setstatusi("order");
+    }
+    localStorage.setItem(`table:${link.id}`, JSON.stringify(data));
   }
 
   socket.on(`table:${link.id}`, tablehandler);
@@ -42,9 +48,9 @@ export default function Nav_button({ link, isCollapsed, index }: any) {
       </TooltipTrigger>
       <TooltipContent side="right" className="flex items-center gap-4">
         {"H" + link.number}
-        {link.label && (
+        {statusi && (
           <span className="ml-auto text-muted-foreground">
-            <Badge variant="outline">{link.label}</Badge>
+            <Badge variant="outline">{statusi}</Badge>
           </span>
         )}
       </TooltipContent>
@@ -65,9 +71,9 @@ export default function Nav_button({ link, isCollapsed, index }: any) {
     >
       <Book className="mr-2 h-4 w-4" />
       {"H" + link.number}
-      {link.label && (
+      {statusi && (
         <span className={cn("ml-auto")}>
-          <Badge variant="outline">{link.label}</Badge>
+          <Badge variant="outline">{statusi}</Badge>
         </span>
       )}
     </a>

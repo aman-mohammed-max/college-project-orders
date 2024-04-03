@@ -13,7 +13,6 @@ import {
   Table,
   TableBody,
   TableCaption,
-  TableCell,
   TableHead,
   TableHeader,
   TableRow,
@@ -26,10 +25,12 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import Foods from "@/components/custom/foods";
 
 export default function Main() {
   const [searchParams] = useSearchParams();
   const [table, settable] = useState<TableProps>();
+  const [orders, setorders] = useState<object | null>();
 
   function deletehandel() {
     const id = searchParams.get("tab");
@@ -43,6 +44,9 @@ export default function Main() {
   }
 
   useEffect(() => {
+    const ordere = JSON.parse(
+      localStorage.getItem(`table:${searchParams.get("tab")}`) as string
+    );
     axios
       .get(`${Url.table}/${searchParams.get("tab")}`)
       .then((res: { data: Out }) => {
@@ -53,6 +57,15 @@ export default function Main() {
           settable(res.data.data);
         }
       });
+    axios.get(`${Url.orders}/${ordere.orderid}`).then((res: { data: Out }) => {
+      if (res.data.status === "error") {
+        toast.error(res.data.message);
+        throw new Error(res.data.message);
+      } else if (res.data.status === "success") {
+        setorders(res.data.data);
+        console.log(res.data.data);
+      }
+    });
   }, [searchParams.get("tab")]);
 
   return (
@@ -127,22 +140,34 @@ export default function Main() {
       <div className="w-full h-[90%] flex justify-center">
         <ScrollArea className="h-full w-11/12 border-x">
           <Table>
-            <TableCaption>A list of your recent invoices.</TableCaption>
+            {
+              // @ts-ignore
+              orders?.foods.length == 0 && (
+                <TableCaption className="text-center">
+                  There is no orders
+                </TableCaption>
+              )
+            }
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[100px]">Invoice</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Method</TableHead>
-                <TableHead className="text-right">Amount</TableHead>
+                <TableHead className="w-[100px]">
+                  {
+                    // @ts-ignore
+                    orders?.foods.length + " " + "items"
+                  }
+                </TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead className="text-right">Quality</TableHead>
+                {/* <TableHead className="text-right">Amount</TableHead> */}
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow>
-                <TableCell className="font-medium">INV001</TableCell>
-                <TableCell>Paid</TableCell>
-                <TableCell>Credit Card</TableCell>
-                <TableCell className="text-right">$250.00</TableCell>
-              </TableRow>
+              {
+                // @ts-ignore
+                orders?.foods.map((food: any) => (
+                  <Foods key={food.id} id={food.id} qn={food.quality} />
+                ))
+              }
             </TableBody>
           </Table>
         </ScrollArea>
